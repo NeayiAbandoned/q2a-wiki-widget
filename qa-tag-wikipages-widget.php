@@ -51,39 +51,49 @@ class qa_tag_wikipages_widget
 	 */
 	function output_widget($region, $place, $themeobject, $template, $request, $qa_content)
 	{
-//		echo print_r($GLOBALS['plugin_tag_desc_map'], true);
+		// $apiURL = 'https://fr.wikipedia.org/w/api.php?action=query&list=search&srwhat=text&srsearch=c%C3%A9page%20OR%20muscaris';
+		// $apiURL = 'http://pratiques.dev.tripleperformance.fr/api.php?action=query&list=search&srwhat=text&srsearch=c%C3%A9page%20OR%20muscaris';
 
+		$wiki = "https://pratiques.dev.tripleperformance.fr/wiki/";
 
-		$apiURL = 'https://fr.wikipedia.org/w/api.php?action=query&list=search&srwhat=text&srsearch=c%C3%A9page%20OR%20muscaris';
-		$apiURL = 'http://localhost/pratiques/api.php?action=query&list=search&srwhat=text&srsearch=c%C3%A9page%20OR%20muscaris';
+		$endPoint = "https://pratiques.dev.tripleperformance.fr/api.php";
 
-		$wiki = "http://localhost/wiki/";
+		if (empty($GLOBALS['plugin_tag_page_tags']))
+			return;
 
-		$endPoint = "http://localhost/pratiques/api.php";
+		$params = [
+			"action" => "query",
+			"list" => "search",
+			"srsearch" => implode(' OR ', $GLOBALS['plugin_tag_page_tags']),
+			"format" => "json"
+		];
 
-		foreach ($GLOBALS['plugin_tag_desc_map'] as $k => $description)
+		$url = $endPoint . "?" . http_build_query( $params );
+
+		$ch = curl_init( $url );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+
+		if (strpos($endPoint, '.dev.') !== false)
 		{
-			$params = [
-				"action" => "query",
-				"list" => "search",
-				"srsearch" => $k,
-				"format" => "json"
-			];
+			curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false);
+		}
 
-			$url = $endPoint . "?" . http_build_query( $params );
+		$output = curl_exec( $ch );
 
-			$ch = curl_init( $url );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			$output = curl_exec( $ch );
-			curl_close( $ch );
-
+		curl_close( $ch );
+		if(!empty($output))
+		{
 			$result = json_decode( $output, true );
-
-			foreach ($result['query']['search'] as $result)
+			if (!empty($result['query']))
 			{
-				echo '<a href="'.$wiki.$result['title'].'">'.$result['title'].'</a><br/>';
+				foreach ($result['query']['search'] as $result)
+				{
+					echo '<a href="'.$wiki.$result['title'].'">'.$result['title'].'</a><br/>';
+				}
 			}
 		}
+
 
 /*
 {
