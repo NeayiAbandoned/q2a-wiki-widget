@@ -56,59 +56,9 @@ class qa_tag_wikipages_widget
 
 		echo '<a id="wiki_api_link" style="display:none;" href="'.QA_WIKIAPI_ENDPOINT.'" data-srsearch="'. implode(' OR ', $GLOBALS['plugin_tag_desc_list']).'">API</a>';
 
-		echo '<h2 id="wiki_widget_foundquestions_title" style="display:none; margin-top:0; padding-top:0;">Articles liés</h2>';
-		echo '<h2 id="wiki_widget_noquestions_title" style="display:none; margin-top:0; padding-top:0;">Pas d\'articles</h2>';
+		echo '<h2 id="wiki_widget_foundquestions_title" style="display:none; margin-top:0; padding-top:0;">'.qa_lang_html('plugin_tag_desc/no_linked_articles_titles').'</h2>';
+		echo '<h2 id="wiki_widget_noquestions_title" style="display:none; margin-top:0; padding-top:0;">'.qa_lang_html('plugin_tag_desc/no_articles_titles').'</h2>';
 		echo '<ul id="wiki_widget_ul" class="qa-related-q-list"></ul>';
 	}
 
-	/**
-	 * Init default values for the plugin options
-	 */
-	function option_default($option)
-	{
-		if ($option == 'plugin_tag_desc_max_len')
-			return 250;
-
-		return null;
-	}
-
-	/**
-	 * Defines the admin options form for the plugin
-	 */
-	function admin_form(&$qa_content)
-	{
-		require_once QA_INCLUDE_DIR.'app/admin.php';
-		require_once QA_INCLUDE_DIR.'app/options.php';
-
-		$permitoptions = qa_admin_permit_options(QA_PERMIT_USERS, QA_PERMIT_SUPERS, false, false);
-
-		$saved=false;
-
-		if (qa_clicked('plugin_tag_desc_save_button')) {
-			qa_opt('plugin_tag_desc_max_len', (int)qa_post_text('plugin_tag_desc_ml_field'));
-			$saved = true;
-		}
-
-		return array(
-			'ok' => $saved ? 'Tag descriptions settings saved' : null,
-
-			'fields' => array(
-				array(
-					'label' => 'Maximum length of tooltips:',
-					'type' => 'number',
-					'value' => (int)qa_opt('plugin_tag_desc_max_len'),
-					'suffix' => 'characters',
-					'tags' => 'NAME="plugin_tag_desc_ml_field"',
-				),
-
-			),
-
-			'buttons' => array(
-				array(
-					'label' => 'Save Changes',
-					'tags' => 'NAME="plugin_tag_desc_save_button"',
-				),
-			),
-		);
-	}
 }
