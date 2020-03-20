@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Adds a TAG_DESC,tagname title to the tag, in order for qa-tag-desc-layer.php to replace
- * it with the proper tag description.
+ * Adds a data-taglc attribute to the tag, in order for wiki_api_client.js to lookup for
+ * a description from the wiki
  */
 function qa_tag_html($tag, $microformats=false, $favorited=false)
 {
@@ -12,12 +12,12 @@ function qa_tag_html($tag, $microformats=false, $favorited=false)
 
 	$taglc = qa_strtolower($tag);
 
-	// store the tag name in a map, for future reference in qa-tag-desc-layer.php
-	$GLOBALS['plugin_tag_desc_list'][$taglc] = true;
+	// store the tag name in a map, for future reference in qa-tag-wikipage-widget.php
+	$GLOBALS['plugin_tag_desc_list'][$taglc] = $taglc;
 
 	$anglepos = strpos($taghtml, '>');
 	if ($anglepos !== false)
-		$taghtml = substr_replace($taghtml, ' title=",TAG_DESC,'.$taglc.',"', $anglepos, 0);
+		$taghtml = substr_replace($taghtml, ' data-taglc="'.$taglc.'" title=""', $anglepos, 0);
 
 	return $taghtml;
 }

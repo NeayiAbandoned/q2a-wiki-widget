@@ -51,92 +51,14 @@ class qa_tag_wikipages_widget
 	 */
 	function output_widget($region, $place, $themeobject, $template, $request, $qa_content)
 	{
-		// $apiURL = 'https://fr.wikipedia.org/w/api.php?action=query&list=search&srwhat=text&srsearch=c%C3%A9page%20OR%20muscaris';
-		// $apiURL = 'http://pratiques.dev.tripleperformance.fr/api.php?action=query&list=search&srwhat=text&srsearch=c%C3%A9page%20OR%20muscaris';
-
-		$wiki = "https://pratiques.dev.tripleperformance.fr/wiki/";
-
-		$endPoint = "https://pratiques.dev.tripleperformance.fr/api.php";
-
-		if (empty($GLOBALS['plugin_tag_page_tags']))
+		if (empty($GLOBALS['plugin_tag_desc_list']))
 			return;
 
-		$params = [
-			"action" => "query",
-			"list" => "search",
-			"srsearch" => implode(' OR ', $GLOBALS['plugin_tag_page_tags']),
-			"format" => "json"
-		];
+		echo '<a id="wiki_api_link" style="display:none;" href="'.QA_WIKIAPI_ENDPOINT.'" data-srsearch="'. implode(' OR ', $GLOBALS['plugin_tag_desc_list']).'">API</a>';
 
-		$url = $endPoint . "?" . http_build_query( $params );
-
-		$ch = curl_init( $url );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-
-		if (strpos($endPoint, '.dev.') !== false)
-		{
-			curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, false);
-			curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false);
-		}
-
-		$output = curl_exec( $ch );
-
-		curl_close( $ch );
-		if(!empty($output))
-		{
-			$result = json_decode( $output, true );
-			if (!empty($result['query']))
-			{
-				foreach ($result['query']['search'] as $result)
-				{
-					echo '<a href="'.$wiki.$result['title'].'">'.$result['title'].'</a><br/>';
-				}
-			}
-		}
-
-
-/*
-{
-    "query": {
-        "searchinfo": {
-            "totalhits": 1
-        },
-        "search": [
-            {
-                "ns": 0,
-                "title": "Muscaris",
-                "pageid": 7050,
-                "size": 1574,
-                "wordcount": 202,
-                "snippet": "|Name=<span class='searchmatch'>Muscaris</span>\n|Description=<span class='searchmatch'>Muscaris</span> est un c\u00e9page blanc cr\u00e9\u00e9 en 1987 par le WBI Freiburg (Allemagne). Issu d\n",
-                "timestamp": "2020-01-14T16:01:32Z"
-            }
-        ]
-    },
-
-*/
-
-
-		// require_once QA_INCLUDE_DIR.'db/metas.php';
-
-		// $parts = explode('/', $request);
-		// $tag = $parts[1];
-
-		// $description = qa_db_tagmeta_get($tag, 'description');
-		// $editurlhtml = qa_path_html('tag-edit/'.$tag);
-
-		// $allowediting = !qa_user_permit_error('plugin_tag_desc_permit_edit');
-
-		// if (strlen($description))
-		// {
-		// 	echo '<span class="tag-description">';
-		// 	echo qa_html($description);
-		// 	echo '</span>';
-		// 	if ($allowediting)
-		// 		echo ' - <a href="'.$editurlhtml.'">'.qa_lang_html('plugin_tag_desc/edit_tag_link').'</a>';
-
-		// } elseif ($allowediting)
-		// 	echo '<a href="'.$editurlhtml.'">'.qa_lang_html('plugin_tag_desc/create_desc_link').'</a>';
+		echo '<h2 id="wiki_widget_foundquestions_title" style="display:none; margin-top:0; padding-top:0;">Articles liés</h2>';
+		echo '<h2 id="wiki_widget_noquestions_title" style="display:none; margin-top:0; padding-top:0;">Pas d\'articles</h2>';
+		echo '<ul id="wiki_widget_ul" class="qa-related-q-list"></ul>';
 	}
 
 	/**
@@ -146,11 +68,6 @@ class qa_tag_wikipages_widget
 	{
 		if ($option == 'plugin_tag_desc_max_len')
 			return 250;
-
-		if ($option == 'plugin_tag_desc_permit_edit') {
-			require_once QA_INCLUDE_DIR.'app/options.php';
-			return QA_PERMIT_EXPERTS;
-		}
 
 		return null;
 	}
@@ -169,7 +86,6 @@ class qa_tag_wikipages_widget
 
 		if (qa_clicked('plugin_tag_desc_save_button')) {
 			qa_opt('plugin_tag_desc_max_len', (int)qa_post_text('plugin_tag_desc_ml_field'));
-			qa_opt('plugin_tag_desc_permit_edit', (int)qa_post_text('plugin_tag_desc_pe_field'));
 			$saved = true;
 		}
 
@@ -185,13 +101,6 @@ class qa_tag_wikipages_widget
 					'tags' => 'NAME="plugin_tag_desc_ml_field"',
 				),
 
-				array(
-					'label' => 'Allow editing:',
-					'type' => 'select',
-					'value' => @$permitoptions[qa_opt('plugin_tag_desc_permit_edit')],
-					'options' => $permitoptions,
-					'tags' => 'NAME="plugin_tag_desc_pe_field"',
-				),
 			),
 
 			'buttons' => array(

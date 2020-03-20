@@ -34,15 +34,6 @@ qa_register_plugin_module(
 	'Tag wiki Pages' // human-readable name of module
 );
 
-
-// The edition page for each tag
-qa_register_plugin_module(
-	'page', // type of module
-	'qa-tag-desc-edit.php', // PHP file containing module class
-	'qa_tag_descriptions_edit_page', // name of module class
-	'Tag Description Edit Page' // human-readable name of module
-);
-
 qa_register_plugin_overrides('qa-tag-desc-overrides.php');
 
 qa_register_plugin_layer(
