@@ -66,8 +66,14 @@ function lookupTagDescription(APIurl)
 {
     // https://pratiques.dev.tripleperformance.fr/api.php?action=query&prop=extracts&exchars=500&exlimit=1&titles=muscaris&explaintext=1&formatversion=2&exsectionformat=plain&format=json
     var links = $('.qa-tag-link');
+    var maxTags = 10;
 
     links.each(function(index) {
+
+        maxTags--;
+
+        if (maxTags < 0)
+            return;
 
         var xhr = new XMLHttpRequest();
         var aTag = this;

@@ -54,7 +54,9 @@ class qa_tag_wikipages_widget
 		if (empty($GLOBALS['plugin_tag_desc_list']))
 			return;
 
-		echo '<a id="wiki_api_link" style="display:none;" href="'.QA_WIKIAPI_ENDPOINT.'" data-srsearch="'. implode(' OR ', $GLOBALS['plugin_tag_desc_list']).'">API</a>';
+		$searchTerms = implode(' ', $GLOBALS['plugin_tag_desc_list']);
+		$searchTerms = implode(' OR ', explode(' ', $searchTerms));
+		echo '<a id="wiki_api_link" style="display:none;" href="'.QA_WIKIAPI_ENDPOINT.'" data-srsearch="'. $searchTerms .'">API</a>';
 
 		echo '<h2 id="wiki_widget_foundquestions_title" style="display:none; margin-top:0; padding-top:0;">'.qa_lang_html('plugin_tag_desc/no_linked_articles_titles').'</h2>';
 		echo '<h2 id="wiki_widget_noquestions_title" style="display:none; margin-top:0; padding-top:0;">'.qa_lang_html('plugin_tag_desc/no_articles_titles').'</h2>';
