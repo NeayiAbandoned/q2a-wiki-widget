@@ -56,6 +56,22 @@ class qa_tag_wikipages_widget
 
 		$searchTerms = implode(' ', $GLOBALS['plugin_tag_desc_list']);
 		$searchTerms = implode(' OR ', explode(' ', $searchTerms));
+
+		// Make sure the search terms are not too long - we limit to 300 chars:
+		$searchTerms = '';
+		foreach ($GLOBALS['plugin_tag_desc_list'] as $aTerm)
+		{
+			$newTerm = preg_replace('@[ -]+@', ' OR ', $aTerm);
+
+			if (strlen($searchTerms) + strlen($newTerm) > 290)
+				break;
+
+			if (empty($searchTerms))
+				$searchTerms = $newTerm;
+			else
+				$searchTerms .= ' OR ' . $newTerm;
+		}
+
 		echo '<a id="wiki_api_link" style="display:none;" href="'.QA_WIKIAPI_ENDPOINT.'" data-srsearch="'. $searchTerms .'">API</a>';
 
 		echo '<h2 id="wiki_widget_foundquestions_title" style="display:none; margin-top:0; padding-top:0;">'.qa_lang_html('plugin_tag_desc/linked_articles_titles').'</h2>';
