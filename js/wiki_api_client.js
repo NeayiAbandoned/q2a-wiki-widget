@@ -68,35 +68,60 @@ function lookupTagDescription(APIurl)
     var links = $('.qa-tag-link');
     var maxTags = 10;
 
+    var tags = new Map();
+
+    // Start by building a map of all tags in the page
+
     links.each(function(index) {
 
-        maxTags--;
-
-        if (maxTags < 0)
+        if (tags.size > 10)
             return;
 
-        var xhr = new XMLHttpRequest();
         var aTag = this;
+
+        // Prepare the ajax request, using GET
+        tags.set(aTag.dataset.taglc, "");
+    });
+
+    // Find the description for the 10 first unique tags
+    for (var [tag, description] of tags) {
+
+        var xhr = new XMLHttpRequest();
 
         // When the ajax request is completed, we can parse the data sent back
         xhr.onload = function() {
-            var results = xhr.response;
+            var results = this.response;
 
             if (results && results.query.pages.length > 0)
             {
                 results.query.pages.forEach(element => {
                     if (!element.missing)
-                        aTag.title = element.extract.replace(/\n[\n]+/gm, "\n");
+                    {
+                        var description = element.extract.replace(/\n[\n]+/gm, "\n");
+                        var tag = element.title.toLowerCase();
+
+                        // Insert the description in the tags links
+                        links.each(function(index) {
+
+                            var xhr = new XMLHttpRequest();
+                            var aTag = this;
+
+                            if (aTag.dataset.taglc != tag)
+                                return;
+
+                            aTag.title = description;
+                        });
+                    }
                 });
             }
         }
 
         // Prepare the ajax request, using GET
-        xhr.open("GET", APIurl + '?action=query&prop=extracts&exchars=250&exlimit=1&explaintext=1&format=json&formatversion=2&exsectionformat=plain&titles=' + aTag.dataset.taglc);
+        xhr.open("GET", APIurl + '?action=query&prop=extracts&exchars=250&exlimit=1&explaintext=1&format=json&formatversion=2&exsectionformat=plain&titles=' + tag);
 
         xhr.responseType = 'json';
         xhr.send();
-    });
+    }
 }
 
 function addTagDescription(APIurl, tagName)
